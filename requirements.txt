@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+pandas
+python-dotenv
+openpyxl
+sqlalchemy
+azure-communication-email
+azure-communication-messages
