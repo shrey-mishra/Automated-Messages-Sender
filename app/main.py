@@ -3,7 +3,6 @@ from app.routes import vendors, email, whatsapp
 from app.database import init_db, load_excel_to_db
 import logging
 from dotenv import load_dotenv
-import os
 
 # Load environment variables
 load_dotenv()
@@ -22,5 +21,5 @@ app.include_router(whatsapp.router, prefix="/api")
 @app.on_event("startup")
 async def startup_event():
     init_db()
-    load_excel_to_db("data/vendors.xlsx")
+    load_excel_to_db("data/MSME Supplier list.xlsx")  # Updated file name
     logger.info("Starting Amber Email & WhatsApp Backend")

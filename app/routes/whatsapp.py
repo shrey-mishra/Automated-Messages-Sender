@@ -14,6 +14,7 @@ async def send_whatsapp_messages():
     conn = sqlite3.connect("vendors.db")
     c = conn.cursor()
     c.execute("SELECT name, phone, vendor_account FROM vendors WHERE whatsapp_status = 'Pending'")
+# No change needed here, as it uses database column 'phone'
     vendors = c.fetchall()
     conn.close()
     

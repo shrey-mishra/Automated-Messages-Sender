@@ -13,6 +13,7 @@ async def send_emails():
     conn = sqlite3.connect("vendors.db")
     c = conn.cursor()
     c.execute("SELECT name, email, vendor_account FROM vendors WHERE email_status = 'Pending'")
+# No change needed here, as it uses database column 'email', not Excel's 'Email '
     vendors = c.fetchall()
     conn.close()
     
