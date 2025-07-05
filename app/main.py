@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.routes import vendors, email, whatsapp
 from app.database import init_db, load_excel_to_db
@@ -10,7 +11,7 @@ import argparse
 # Load environment variables
 load_dotenv()
 
-# Configure logging (console and file)
+# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -33,6 +34,15 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Amber Email & WhatsApp Backend")
 
 app = FastAPI(title="Amber Email & WhatsApp Backend", version="1.0.0", lifespan=lifespan)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include route modules
 app.include_router(vendors.router, prefix="/api")

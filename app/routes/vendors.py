@@ -31,31 +31,47 @@ async def update_status(update: StatusUpdate):
     """Update vendor email or WhatsApp status."""
     if update.status not in ['Pending', 'Sent', 'Reverted']:
         raise HTTPException(status_code=400, detail="Invalid status")
-    if update.channel not in ['email', 'whatsapp']:
-        raise HTTPException(status_code=400, detail="Invalid channel")
+    if update.status_type not in ['email_status', 'whatsapp_status']:
+        raise HTTPException(status_code=400, detail="Invalid status_type")
     
-    column = "email_status" if update.channel == "email" else "whatsapp_status"
     conn = sqlite3.connect("vendors.db")
     c = conn.cursor()
-    c.execute(f"UPDATE vendors SET {column} = ? WHERE vendor_account = ?", 
+    c.execute(f"UPDATE vendors SET {update.status_type} = ? WHERE vendor_account = ?", 
               (update.status, update.vendor_account))
     conn.commit()
     conn.close()
     
-    return {"vendor_account": update.vendor_account, "status": update.status, "channel": update.channel}
+    return {"success": True, "message": "Status updated successfully"}
 
 @router.get("/status_counts")
 async def get_status_counts():
     """Get email and WhatsApp status counts."""
     conn = sqlite3.connect("vendors.db")
     c = conn.cursor()
+    
+    # Get email status counts
     c.execute("SELECT email_status, COUNT(*) FROM vendors GROUP BY email_status")
     email_counts = c.fetchall()
+    
+    # Get whatsapp status counts  
     c.execute("SELECT whatsapp_status, COUNT(*) FROM vendors GROUP BY whatsapp_status")
     whatsapp_counts = c.fetchall()
+    
     conn.close()
     
+    # Format for frontend
+    email_status = {"Pending": 0, "Sent": 0, "Reverted": 0}
+    whatsapp_status = {"Pending": 0, "Sent": 0, "Reverted": 0}
+    
+    for status, count in email_counts:
+        if status in email_status:
+            email_status[status] = count
+            
+    for status, count in whatsapp_counts:
+        if status in whatsapp_status:
+            whatsapp_status[status] = count
+    
     return {
-        "email": {"labels": [row[0] for row in email_counts], "data": [row[1] for row in email_counts]},
-        "whatsapp": {"labels": [row[0] for row in whatsapp_counts], "data": [row[1] for row in whatsapp_counts]}
+        "email_status": email_status,
+        "whatsapp_status": whatsapp_status
     }
