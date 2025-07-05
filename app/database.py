@@ -10,7 +10,9 @@ def init_db():
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS vendors
                  (vendor_account TEXT PRIMARY KEY, name TEXT, email TEXT, phone TEXT,
-                  msme_status TEXT, msme_category TEXT, email_status TEXT, whatsapp_status TEXT)''')
+                  msme_status TEXT, msme_category TEXT, udyam_number TEXT, 
+                  certificate_path TEXT, declaration_signed BOOLEAN,
+                  email_status TEXT, whatsapp_status TEXT)''')
     conn.commit()
     conn.close()
     logger.info("Database initialized")
@@ -30,10 +32,11 @@ def load_excel_to_db(excel_path="data/MSME Supplier list.xlsx"):
             invalid_phones.append((row['Vendor account'], row['Name'], row['Phone ']))
             continue
         c.execute('''INSERT OR REPLACE INTO vendors
-                     (vendor_account, name, email, phone, msme_status, msme_category, email_status, whatsapp_status)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)''',
+                     (vendor_account, name, email, phone, msme_status, msme_category, 
+                      udyam_number, certificate_path, declaration_signed, email_status, whatsapp_status)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
                   (row['Vendor account'], row['Name'], row['Email '], phone,
-                   row['Current Msme Staus '], row['MSME Category'], 'Pending', 'Pending'))
+                   row['Current Msme Staus '], row['MSME Category'], None, None, None, 'Pending', 'Pending'))
     conn.commit()
     conn.close()
     if invalid_phones:

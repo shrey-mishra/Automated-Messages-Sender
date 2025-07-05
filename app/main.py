@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.routes import vendors, email, whatsapp
+from app.routes import vendors, email, whatsapp, register
 from app.database import init_db, load_excel_to_db
 import logging
 from dotenv import load_dotenv
@@ -11,7 +11,7 @@ import argparse
 # Load environment variables
 load_dotenv()
 
-# Configure logging
+# Configure logging (console and file)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -38,7 +38,7 @@ app = FastAPI(title="Amber Email & WhatsApp Backend", version="1.0.0", lifespan=
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, replace with your frontend domain
+    allow_origins=["*"],  # Configure this properly for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,6 +48,7 @@ app.add_middleware(
 app.include_router(vendors.router, prefix="/api")
 app.include_router(email.router, prefix="/api")
 app.include_router(whatsapp.router, prefix="/api")
+app.include_router(register.router, prefix="/api")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run FastAPI server locally")
